@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--
         Base application theme, dependent on API level. This theme is replaced
@@ -15,6 +15,14 @@
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+    </style>
+    
+    <style name="Widget" ></style>
+    
+    <style name="Widget.SampleOutput" >
+        <item name="android:padding" >@dimen/margin_medium</item>
+        <item name="android:textAppearance" >?android:textAppearanceMedium</item>
+        <item name="android:lineSpacingMultiplier" >1.1</item>
     </style>
 
 </resources>

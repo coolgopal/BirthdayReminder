@@ -6,7 +6,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends Activity {
-
+	
+	BirthdayAlarmReceiver alarm = new BirthdayAlarmReceiver();
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,9 +27,15 @@ public class MainActivity extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		switch (id) {
+		case R.id.start_action:
+			alarm.setAlarm(this);
+			return true;
+		case R.id.cancel_action:
+			alarm.cancelAlarm(this);
 			return true;
 		}
-		return super.onOptionsItemSelected(item);
+
+		return false;
 	}
 }
