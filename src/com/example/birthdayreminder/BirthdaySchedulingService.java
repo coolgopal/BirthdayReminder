@@ -36,6 +36,8 @@ public class BirthdaySchedulingService extends IntentService {
 		String[] projection =  //null;
 				new String[]{
 				ContactsContract.Contacts.DISPLAY_NAME,
+				//ContactsContract.CommonDataKinds.Phone.NUMBER,
+				ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER,
 				ContactsContract.CommonDataKinds.Event.CONTACT_ID,
 				ContactsContract.CommonDataKinds.Event.START_DATE
 		};
@@ -63,8 +65,24 @@ public class BirthdaySchedulingService extends IntentService {
 		
 		while(cursor.moveToNext())
 		{
-			String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-			String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+			String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.CONTACT_ID));
+			String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+			String number = "";
+			if(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER))) > 0)
+			{
+				Cursor numbers = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, 
+						null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", 
+						new String[]{id}, null);
+				
+				while(numbers.moveToNext())
+				{
+					number = numbers.getString(numbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+					number = number + ", ";
+				}
+				
+				numbers.close();
+			}
+			  
 			String birthDate = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE)); 
 
 			Log.d(this.getClass().getSimpleName(), "name="+name+"; number="+number+"; Birth Date="+birthDate);
