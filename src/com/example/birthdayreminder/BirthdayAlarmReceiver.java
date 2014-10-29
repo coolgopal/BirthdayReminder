@@ -32,12 +32,12 @@ public class BirthdayAlarmReceiver extends WakefulBroadcastReceiver {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
 		// Set the alarm trigger time
-		calendar.set(Calendar.HOUR_OF_DAY, 17);
-		calendar.set(Calendar.MINUTE, 17);
+		calendar.set(Calendar.HOUR_OF_DAY, 15);
+		calendar.set(Calendar.MINUTE, 32);
 		calendar.set(Calendar.SECOND, 00);
 		
 		Log.d(this.getClass().getSimpleName(), "Setting Alarm at "+calendar.getTime().toLocaleString());
-		alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), AlarmManager.INTERVAL_DAY, alarmIntent);
+		alarmMgr.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), 300000, alarmIntent);
 	}
 	
 	public void cancelAlarm(Context context)
@@ -47,6 +47,7 @@ public class BirthdayAlarmReceiver extends WakefulBroadcastReceiver {
 		if(alarmMgr != null)
 		{
 			alarmMgr.cancel(alarmIntent);
+			Log.d(this.getClass().getSimpleName(), "Alarm Cancelled!!");
 		}
 	}
 

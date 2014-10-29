@@ -5,6 +5,10 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -25,10 +29,49 @@ public class BirthdaySchedulingService extends IntentService {
 		sendNotification("Alarm Expired!!!");
 	}
 	
+	private Cursor getContactsBirthdays()
+	{
+		Uri uri = ContactsContract.Data.CONTENT_URI;
+		
+		String[] projection =  //null;
+				new String[]{
+				ContactsContract.Contacts.DISPLAY_NAME,
+				ContactsContract.CommonDataKinds.Event.CONTACT_ID,
+				ContactsContract.CommonDataKinds.Event.START_DATE
+		};
+
+		String selection = ContactsContract.Data.MIMETYPE + " = ? AND " +
+				ContactsContract.CommonDataKinds.Event.TYPE + " = " +
+				ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY;
+
+		String[] selectionArgs = new String[]{
+				ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE
+		};
+
+		String sortOrder = null;
+		
+		return getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder);
+	}
+	
 	private void sendNotification(String msg)
 	{
-		Log.d(this.getClass().getSimpleName(), "Display Notification!!! Fetch Contact Info");
+		Log.d(this.getClass().getSimpleName(), "Fetch Contact Info...");
 		
+		Cursor cursor = getContactsBirthdays();
+		
+		cursor.moveToFirst();
+		
+		while(cursor.moveToNext())
+		{
+			String name = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+			String number = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
+			String birthDate = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE)); 
+
+			Log.d(this.getClass().getSimpleName(), "name="+name+"; number="+number+"; Birth Date="+birthDate);
+		}
+		
+		cursor.close();
+		Log.d(this.getClass().getSimpleName(), "Fetch Contact Info... Done");
 		
 		mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
 		
