@@ -5,12 +5,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 public class BirthdaySchedulingService extends IntentService {
 	
@@ -26,74 +21,17 @@ public class BirthdaySchedulingService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent intent) {
 		// TODO Auto-generated method stub
-		sendNotification("Alarm Expired!!!");
+		sendNotification();
 	}
 	
-	private Cursor getContactsBirthdays()
+	private void sendNotification()
 	{
-		Uri uri = ContactsContract.Data.CONTENT_URI;
-		
-		String[] projection =  //null;
-				new String[]{
-				ContactsContract.Contacts.DISPLAY_NAME,
-				//ContactsContract.CommonDataKinds.Phone.NUMBER,
-				ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER,
-				ContactsContract.CommonDataKinds.Event.CONTACT_ID,
-				ContactsContract.CommonDataKinds.Event.START_DATE
-		};
-
-		String selection = ContactsContract.Data.MIMETYPE + " = ? AND " +
-				ContactsContract.CommonDataKinds.Event.TYPE + " = " +
-				ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY;
-
-		String[] selectionArgs = new String[]{
-				ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE
-		};
-
-		String sortOrder = null;
-		
-		return getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder);
-	}
-	
-	private void sendNotification(String msg)
-	{
-		Log.d(this.getClass().getSimpleName(), "Fetch Contact Info...");
-		
-		Cursor cursor = getContactsBirthdays();
-		
-		cursor.moveToFirst();
-		
-		while(cursor.moveToNext())
-		{
-			String id = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.CONTACT_ID));
-			String name = cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-			String number = "";
-			if(Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.HAS_PHONE_NUMBER))) > 0)
-			{
-				Cursor numbers = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, 
-						null, ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", 
-						new String[]{id}, null);
-				
-				while(numbers.moveToNext())
-				{
-					number = numbers.getString(numbers.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER));
-					number = number + ", ";
-				}
-				
-				numbers.close();
-			}
-			  
-			String birthDate = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE)); 
-
-			Log.d(this.getClass().getSimpleName(), "name="+name+"; number="+number+"; Birth Date="+birthDate);
-		}
-		
-		cursor.close();
-		Log.d(this.getClass().getSimpleName(), "Fetch Contact Info... Done");
+		BirthdayList.initBirthdayList(this);
+		String msg = String.valueOf(BirthdayList.getCount()) + " people's birthday today!!";
 		
 		mNotificationManager = (NotificationManager)this.getSystemService(Context.NOTIFICATION_SERVICE);
 		
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, BirthdayListActivity.class), 0);
 		
 		NotificationCompat.Builder mBuilder = 
 				new NotificationCompat.Builder(this)
@@ -102,6 +40,7 @@ public class BirthdaySchedulingService extends IntentService {
 		.setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
 		.setContentText(msg);
 		
+		mBuilder.setAutoCancel(true);
 		mBuilder.setContentIntent(contentIntent);
 		mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
 	}

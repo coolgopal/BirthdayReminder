@@ -32,8 +32,8 @@ public class BirthdayAlarmReceiver extends WakefulBroadcastReceiver {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
 		// Set the alarm trigger time
-		calendar.set(Calendar.HOUR_OF_DAY, 15);
-		calendar.set(Calendar.MINUTE, 32);
+		calendar.set(Calendar.HOUR_OF_DAY, 10);
+		calendar.set(Calendar.MINUTE, 30);
 		calendar.set(Calendar.SECOND, 00);
 		
 		Log.d(this.getClass().getSimpleName(), "Setting Alarm at "+calendar.getTime().toLocaleString());
