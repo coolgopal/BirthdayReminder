@@ -1,6 +1,9 @@
 package com.example.birthdayreminder;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -11,7 +14,7 @@ import android.util.Log;
 public class BirthdayList {
 
 	static Context mContext;
-	static ArrayList<BirthdayListItem> mbirthdayList;
+	static ArrayList<BirthdayListItem> mBirthdayList;
 	static int mBirthdayCount;
 	
 	private static Cursor getContactsBirthdays()
@@ -44,8 +47,14 @@ public class BirthdayList {
 	{
 		mContext = context;
 		Log.d(mContext.getClass().getSimpleName(), "Fetch Contact Info...");
-
-		mbirthdayList = new ArrayList<BirthdayListItem>();
+		
+		Calendar cal = Calendar.getInstance();
+		//SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		//Date date = formatter.parse();
+		int date = cal.get(Calendar.DATE);
+		Log.d(mContext.getClass().getSimpleName(), "Today is " + date);
+		
+		mBirthdayList = new ArrayList<BirthdayListItem>();
 		Cursor cursor = getContactsBirthdays();
 
 		mBirthdayCount = cursor.getCount();
@@ -69,11 +78,11 @@ public class BirthdayList {
 
 				numbers.close();
 			}
-
+			int bday = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE));
 			String birthDate = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE)); 
-			mbirthdayList.add(new BirthdayListItem(name, number, birthDate));
+			mBirthdayList.add(new BirthdayListItem(name, number, birthDate));
 
-			Log.d(mContext.getClass().getSimpleName(), "name="+name+"; number="+number+"; Birth Date="+birthDate);
+			Log.d(mContext.getClass().getSimpleName(), "name="+name+"; number="+number+"; Birth Date="+bday);
 		}			
 
 		cursor.close();
@@ -87,6 +96,6 @@ public class BirthdayList {
 	
 	public static ArrayList<BirthdayListItem> getBirthdayList()
 	{
-		return mbirthdayList;
+		return mBirthdayList;
 	}
 }

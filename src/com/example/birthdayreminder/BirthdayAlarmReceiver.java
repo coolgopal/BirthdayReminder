@@ -11,7 +11,7 @@ import android.util.Log;
 
 public class BirthdayAlarmReceiver extends WakefulBroadcastReceiver {
 
-	private AlarmManager alarmMgr;
+	private static AlarmManager alarmMgr;
 	private PendingIntent alarmIntent;
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -48,6 +48,7 @@ public class BirthdayAlarmReceiver extends WakefulBroadcastReceiver {
 		{
 			alarmMgr.cancel(alarmIntent);
 			Log.d(this.getClass().getSimpleName(), "Alarm Cancelled!!");
+			alarmMgr = null;
 		}
 	}
 
