@@ -1,7 +1,9 @@
 package com.example.birthdayreminder;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -19,6 +21,24 @@ public class MainActivity extends Activity {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+	
+	
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		// TODO Auto-generated method stub
+		super.onNewIntent(intent);
+		Log.d("MainActivity", "onNewIntent:"+intent.getAction());
+	}
+	
+	
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		Log.d("MainActivity", "onResume:");
 	}
 
 	@Override

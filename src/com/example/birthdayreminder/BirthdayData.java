@@ -1,5 +1,6 @@
 package com.example.birthdayreminder;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -9,15 +10,26 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.ContactsContract;
+import android.text.format.DateFormat;
 import android.util.Log;
 
-public class BirthdayList {
+public class BirthdayData {
 
-	static Context mContext;
-	static ArrayList<BirthdayListItem> mBirthdayList;
-	static int mBirthdayCount;
-	
-	private static Cursor getContactsBirthdays()
+	Context mContext;
+	ArrayList<BirthdayListItem> mBirthdayList;
+	int mBirthdayCount;
+	static BirthdayData mBirthdayData;
+	private BirthdayData(Context ctx){
+		mContext = ctx;
+		
+	}
+	public static BirthdayData getInstance(Context ctx){
+		if(mBirthdayData == null){
+			mBirthdayData = new BirthdayData(ctx);
+		}
+		return mBirthdayData;
+	}
+	private  Cursor getContactsBirthdays()
 	{
 		Uri uri = ContactsContract.Data.CONTENT_URI;
 		
@@ -32,10 +44,13 @@ public class BirthdayList {
 
 		String selection = ContactsContract.Data.MIMETYPE + " = ? AND " +
 				ContactsContract.CommonDataKinds.Event.TYPE + " = " +
-				ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY;
-
+				ContactsContract.CommonDataKinds.Event.TYPE_BIRTHDAY + " AND "+
+				ContactsContract.CommonDataKinds.Event.START_DATE+"=?";
+       DateFormat formate = new DateFormat();
+       String todayDate = formate.format("yyyy-MM-dd", System.currentTimeMillis()).toString();
+       Log.d("Birthday","today date:"+todayDate);
 		String[] selectionArgs = new String[]{
-				ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE
+				ContactsContract.CommonDataKinds.Event.CONTENT_ITEM_TYPE,todayDate
 		};
 
 		String sortOrder = null;
@@ -43,16 +58,15 @@ public class BirthdayList {
 		return mContext.getContentResolver().query(uri, projection, selection, selectionArgs, sortOrder);
 	}
 
-	public static void initBirthdayList(Context context)
+	public  void initBirthdayList()
 	{
-		mContext = context;
 		Log.d(mContext.getClass().getSimpleName(), "Fetch Contact Info...");
 		
 		Calendar cal = Calendar.getInstance();
-		//SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		//Date date = formatter.parse();
-		int date = cal.get(Calendar.DATE);
-		Log.d(mContext.getClass().getSimpleName(), "Today is " + date);
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int month = cal.get(Calendar.MONTH);
+		int year = cal.get(Calendar.YEAR);
+		Log.d(mContext.getClass().getSimpleName(), "Today is " + year + "-" + month + "-" + day);
 		
 		mBirthdayList = new ArrayList<BirthdayListItem>();
 		Cursor cursor = getContactsBirthdays();
@@ -78,23 +92,32 @@ public class BirthdayList {
 
 				numbers.close();
 			}
-			int bday = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE));
-			String birthDate = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE)); 
+
+			//int bday = cursor.getInt(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.));
+			String birthDate = cursor.getString(cursor.getColumnIndex(ContactsContract.CommonDataKinds.Event.START_DATE));
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			try {
+				Date date = formatter.parse(birthDate);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			mBirthdayList.add(new BirthdayListItem(name, number, birthDate));
 
-			Log.d(mContext.getClass().getSimpleName(), "name="+name+"; number="+number+"; Birth Date="+bday);
+			Log.d(mContext.getClass().getSimpleName(), "name="+name+"; number="+number+"; Birth Date="+birthDate);
 		}			
 
 		cursor.close();
 		Log.d(mContext.getClass().getSimpleName(), "Fetch Contact Info... Done");
 	}
 	
-	public static int getCount()
+	public  int getCount()
 	{
 		return mBirthdayCount;
 	}
 	
-	public static ArrayList<BirthdayListItem> getBirthdayList()
+	public  ArrayList<BirthdayListItem> getBirthdayList()
 	{
 		return mBirthdayList;
 	}

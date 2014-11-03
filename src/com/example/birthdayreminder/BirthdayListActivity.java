@@ -25,11 +25,13 @@ public class BirthdayListActivity extends ListActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		
+		BirthdayData data = BirthdayData.getInstance(getApplicationContext());
+		if(data.getCount() > 0){
 		ArrayAdapter<BirthdayListItem> adapter = new ArrayAdapter<BirthdayListItem>(this,
-							android.R.layout.simple_list_item_1, BirthdayList.mBirthdayList);
+							android.R.layout.simple_list_item_1,data.getBirthdayList());
 		
 		setListAdapter(adapter);
+		}
 	}
 	
 	void showDialog(String name, final String number)

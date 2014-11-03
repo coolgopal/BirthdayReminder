@@ -21,6 +21,7 @@
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
+            android:launchMode="singleTop"
             android:uiOptions="splitActionBarWhenNarrow" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -33,8 +34,17 @@
             android:label="@string/app_name" >
         </activity>
         
-        <receiver android:name=".BirthdayAlarmReceiver"></receiver>
-        <service android:name=".BirthdaySchedulingService"></service>
+        <receiver android:name=".BirthdayAlarmReceiver">
+            <intent-filter >
+                <action android:name="com.example.CHK_BIRTHDAY"/>
+            </intent-filter>
+        </receiver>
+        <service android:name=".BirthdaySchedulingService">
+            <intent-filter >
+                <category android:name="android.intent.category.DEFAULT"/>
+                <action android:name="com.example.CHK_BIRTHDAY"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
